@@ -17,6 +17,7 @@ let run
   let runProcess buildJsonFilename =
     let%bind command = RunAsync.ofRun (
       let open Run.Syntax in
+      print_endline("Running command for action: " ^ action);
       return Cmd.(
         cfg.esyBuildPackageCommand
         % action
