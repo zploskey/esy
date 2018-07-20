@@ -1144,6 +1144,7 @@ let isRoot ~cfg task =
 let rewritePrefix ~(cfg : Config.t) ~origPrefix ~destPrefix rootPath =
   let open RunAsync.Syntax in
   let rewritePrefixInFile path =
+    print_endline("Task.ml::rewritePrefix origPrefix: " ^ Fpath.to_string(origPrefix) ^ " destPrefix: " ^ Fpath.to_string(destPrefix) ^ " rootPath: " ^ Fpath.to_string(rootPath));
     let cmd = Cmd.(cfg.fastreplacestringCommand % p path % p origPrefix % p destPrefix) in
     ChildProcess.run cmd
   in
