@@ -88,6 +88,7 @@ let rec realpath = (p: Fpath.t) => {
  */
 let putTempFile = (contents: string) => {
   let%bind filename = Bos.OS.File.tmp("%s");
+  print_endline(" -- putTempFile: " ++ Fpath.to_string(filename));
   let%bind () = Bos.OS.File.write(filename, contents);
   Ok(filename);
 };
