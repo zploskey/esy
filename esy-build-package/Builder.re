@@ -77,6 +77,7 @@ let withLock = (lockPath: Path.t, f) => {
 let commitBuildToStore = (config: Config.t, task: BuildTask.t) => {
   open Run;
   let rewritePrefixInFile = (~origPrefix, ~destPrefix, path) => {
+    print_endline("rewritePrefixInFile - origPrefix: " ++ origPrefix ++ " destPrefix: " ++ destPrefix ++ " path: " ++ path);
     let cmd =
       Bos.Cmd.(
         empty
