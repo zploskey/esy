@@ -332,7 +332,6 @@ let withTempFile ~data f =
 
   Lwt.finalize
     (fun () -> f (Path.v path))
-    (fun () -> Lwt_unix.unlink path)
 
 let realpath path =
   let open RunAsync.Syntax in
