@@ -222,8 +222,13 @@ module CommandLineInterface = {
         };
         (progress, finish);
       };
-      let%bind esySolveCmd =
-        resolve("esy-solve-cudf/esySolveCudfCommand.exe");
+
+      let%bind esySolveCmd = switch (System.Platform.host) {
+        /* HACK: Temporary workaround for #302, so that we can still leverage esyi on Windows when an `esy.lock.json` file is present */
+        | Windows => return(Cmd.v("esy-solve-cudf/esySolveCudfCommand.exe"))
+        | _ => resolve("esy-solve-cudf/esySolveCudfCommand.exe")
+      };
+
       let%bind cfg =
         Config.make(
           ~esySolveCmd,
