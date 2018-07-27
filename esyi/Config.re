@@ -57,6 +57,8 @@ let make =
           ),
         );
 
+      print_endline ("Config::make - cachePath: " ++ Path.to_string(cachePath));
+
       let cacheTarballsPath =
         switch (cacheTarballsPath) {
         | Some(cacheTarballsPath) => cacheTarballsPath
