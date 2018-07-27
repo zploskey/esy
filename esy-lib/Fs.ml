@@ -15,12 +15,12 @@ let readFile (path : Path.t) =
     Lwt_io.with_file ~mode:Lwt_io.Input path f
   )
 
-let writeFile ~data (path : Path.t) =
+let writeFile ?perm ~data (path : Path.t) =
   let path = Path.to_string path in
   let desc = Printf.sprintf "Unable to write file %s" path in
   toRunAsync ~desc (fun () ->
     let f oc = Lwt_io.write oc data in
-    Lwt_io.with_file ~mode:Lwt_io.Output path f
+    Lwt_io.with_file ?perm ~mode:Lwt_io.Output path f
   )
 
 let openFile ~mode ~perm path =
@@ -166,14 +166,19 @@ let traverse ?skipTraverse ~f path =
   let f _ path stat = f path stat in
   fold ?skipTraverse ~f ~init:() path
 
+let chownOrIgnoreLwt path uid gid =
+    match System.Platform.host with
+    | Windows -> Lwt.return () (* chown is not available in Windows *)
+    | _ ->
+        try%lwt Lwt_unix.chown path uid gid
+        with Unix.Unix_error (Unix.EPERM, _, _) -> Lwt.return ()
+
 let copyStatLwt ~stat path =
   let path = Path.to_string path in
   let%lwt () = Lwt_unix.utimes path stat.Unix.st_atime stat.Unix.st_mtime in
   let%lwt () = Lwt_unix.chmod path stat.Unix.st_perm in
-  let%lwt () =
-    try%lwt Lwt_unix.chown path stat.Unix.st_uid stat.Unix.st_gid
-    with Unix.Unix_error (Unix.EPERM, _, _) -> Lwt.return ()
-  in Lwt.return ()
+  let%lwt () = chownOrIgnoreLwt path stat.Unix.st_uid stat.Unix.st_gid in
+  Lwt.return ()
 
 let copyFileLwt ~src ~dst =
 

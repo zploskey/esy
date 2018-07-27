@@ -1,9 +1,10 @@
 module.exports = {
-  projects: [
-    {
-      displayName: 'e2e:js',
-      moduleFileExtensions: ['js'],
-      testMatch: ['<rootDir>/test-e2e/**/*.test.js'],
-    }
-  ],
+  displayName: 'e2e:fast',
+  moduleFileExtensions: ['js'],
+  testMatch: ['<rootDir>/test-e2e/**/*.test.js'],
+  modulePathIgnorePatterns: [
+    '<rootDir>/esy-install/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/test-e2e/build/fixtures/'
+  ]
 };
