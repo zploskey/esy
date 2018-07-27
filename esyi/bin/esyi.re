@@ -4,6 +4,7 @@ module String = Astring.String;
 module Api = {
   let lockfilePath = (sandbox: Sandbox.t) => {
     open RunAsync.Syntax;
+    print_endline("esyi::Api::lockfilePath - sandbox.path: " ++ Path.to_string(sandbox.path));
     let filename = Path.(sandbox.path / "esyi.lock.json");
     if%bind (Fs.exists(filename)) {
       let%lwt () =
@@ -29,6 +30,7 @@ module Api = {
     RunAsync.Syntax.(
       {
         let%bind lockfilePath = lockfilePath(sandbox);
+        print_endline("fetch: " ++ Path.to_string(lockfilePath));
         switch%bind (Solution.LockfileV1.ofFile(~sandbox, lockfilePath)) {
         | Some(solution) =>
           let%bind () =
@@ -65,9 +67,11 @@ module Api = {
           if%bind (Fetch.isInstalled(~sandbox, solution)) {
             return();
           } else {
+            print_endline("solveAndFetch:fetching");
             fetch(sandbox);
           }
         | None =>
+          print_endline("solveAndFetch:fetching & solving");
           let%bind () = solve(sandbox);
           fetch(sandbox);
         };
@@ -86,6 +90,7 @@ module CommandLineInterface = {
   let version = "0.1.0";
 
   let resolve = req => {
+    print_endline("esyi::CommandLineInterface::resolve: " ++ req);
     open RunAsync.Syntax;
     let currentExecutable = Path.v(Sys.executable_name);
     let%bind currentFilename = Fs.realpath(currentExecutable);
@@ -277,6 +282,7 @@ module CommandLineInterface = {
   };
 
   let defaultCommand = {
+    print_endline ("Default command");
     let doc = "Dependency installer";
     let info = Term.info("esyi", ~version, ~doc, ~sdocs, ~exits);
     let cmd = sandbox => Api.solveAndFetch(sandbox);
@@ -292,6 +298,7 @@ module CommandLineInterface = {
   };
 
   let installCommand = {
+    print_endline ("Install command");
     let doc = "Solve & fetch dependencies";
     let info = Term.info("install", ~version, ~doc, ~sdocs, ~exits);
     let cmd = cfg => Api.solveAndFetch(cfg);

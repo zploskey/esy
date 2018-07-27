@@ -43,6 +43,7 @@ let writeJsonFile ~json path =
 let exists (path : Path.t) =
   let path = Path.to_string path in
   let%lwt exists = Lwt_unix.file_exists path in
+  print_endline("fs::exists - " ^ path ^ " - " ^ string_of_bool(exists));
   RunAsync.return exists
 
 let chmod permission (path : Path.t) =

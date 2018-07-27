@@ -292,6 +292,7 @@ module LockfileV1 = struct
     root, node
 
   let ofFile ~(sandbox : Sandbox.t) (path : Path.t) =
+    print_endline ("Solution::ofFile");
     let open RunAsync.Syntax in
     if%bind Fs.exists path
     then
@@ -301,12 +302,18 @@ module LockfileV1 = struct
       in
       match lockfile with
       | Ok lockfile ->
-        if lockfile.hash = computeSandboxChecksum sandbox
-        then
+        print_endline (" -- ok lockfile");
+        let computedChecksum = computeSandboxChecksum sandbox in
+        print_endline("lockfile.hash: " ^ lockfile.hash ^ " derp: " ^ computedChecksum);
+        (* TEMPORARILY REMOVING THESE FOR INVESTIGATION *)
+        (*if lockfile.hash = computedChecksum *)
+        (*then *)
           let solution = solutionOfLockfile ~sandbox lockfile.root lockfile.node in
           return (Some solution)
-        else return None
+        (*else return None *)
+        (* TODO: Better error message? *)
       | Error err ->
+        print_endline (" -- error err");
         let msg =
           let path =
             Option.orDefault
