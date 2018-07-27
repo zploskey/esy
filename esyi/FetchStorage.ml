@@ -13,6 +13,23 @@ module Dist = struct
     Fmt.pf fmt "%s@%a" dist.name Package.Version.pp dist.version
 end
 
+    let safeName name  =
+      let replaceAt = Str.regexp "@" in
+      let replaceUnderscore = Str.regexp "_+" in
+      let replaceSlash = Str.regexp "\\/" in
+      let replaceDot = Str.regexp "\\." in
+      let replaceDash = Str.regexp "\\-" in
+      let replaceColon = Str.regexp ":" in
+      let result = name
+      |> Str.global_replace replaceAt ""
+      |> Str.global_replace replaceUnderscore "__"
+      |> Str.global_replace replaceSlash "__slash__"
+      |> Str.global_replace replaceDot "__dot__"
+      |> Str.global_replace replaceColon "__colon__"
+      |> Str.global_replace replaceDash "_" 
+      in
+      result
+
 let cacheId source (record : Solution.Record.t) =
 
   let hash vs =
@@ -170,9 +187,16 @@ let fetch ~(cfg : Config.t) (record : Solution.Record.t) =
     return ()
   in
 
+
   let doFetchIfNeeded source =
-    let key = cacheId source record in
-    let tarballPath = Path.(cfg.cacheTarballsPath // v key |> addExt "tgz") in
+
+    let unsafeKey = cacheId source record in
+    let key = safeName unsafeKey in
+    print_endline(" -- key: " ^ key);
+    print_endline("--test: " ^ (Path.to_string Path.(v "C:/" // v "derp:derp" )));
+    let tarballPath = Path.(cfg.cacheTarballsPath // v (normalizePathSlashes key) |> addExt "tgz") in
+    print_endline("FetchStorage::doFetchIfNeeded - cacheTarballsPath: " ^ (Path.to_string cfg.cacheTarballsPath));
+    print_endline("FetchStorage::doFetchIfNeeded - tarballPath: " ^ (Path.to_string tarballPath));
 
     let dist = {
       Dist.
