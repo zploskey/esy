@@ -64,6 +64,7 @@ let fetch ~(cfg : Config.t) (record : Solution.Record.t) =
   let open RunAsync.Syntax in
 
   let doFetch path source =
+    print_endline("doFetch");
     match source with
 
     | Package.Source.LocalPath _ ->
@@ -193,7 +194,7 @@ let fetch ~(cfg : Config.t) (record : Solution.Record.t) =
     let unsafeKey = cacheId source record in
     let key = safeName unsafeKey in
     print_endline(" -- key: " ^ key);
-    print_endline("--test: " ^ (Path.to_string Path.(v "C:/" // v "derp:derp" )));
+    print_endline("--test: " ^ (Path.to_string Path.(v "C:/" // v "test:test" )));
     let tarballPath = Path.(cfg.cacheTarballsPath // v (normalizePathSlashes key) |> addExt "tgz") in
     print_endline("FetchStorage::doFetchIfNeeded - cacheTarballsPath: " ^ (Path.to_string cfg.cacheTarballsPath));
     print_endline("FetchStorage::doFetchIfNeeded - tarballPath: " ^ (Path.to_string tarballPath));

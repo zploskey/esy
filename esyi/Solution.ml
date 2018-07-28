@@ -304,7 +304,7 @@ module LockfileV1 = struct
       | Ok lockfile ->
         print_endline (" -- ok lockfile");
         let computedChecksum = computeSandboxChecksum sandbox in
-        print_endline("lockfile.hash: " ^ lockfile.hash ^ " derp: " ^ computedChecksum);
+        print_endline("lockfile.hash: " ^ lockfile.hash ^ " computed: " ^ computedChecksum);
         (* TEMPORARILY REMOVING THESE FOR INVESTIGATION *)
         (*if lockfile.hash = computedChecksum *)
         (*then *)

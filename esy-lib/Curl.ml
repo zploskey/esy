@@ -12,6 +12,13 @@ type headers = string StringMap.t
 
 type url = string
 
+let toEsyBashCommand cmd =
+    let resolvedCommand = EsyBash.toEsyBashCommand (Cmd.toBosCmd cmd) in
+    match resolvedCommand with
+    | Ok v -> RunAsync.return (Cmd.ofBosCmd v)
+    | Error (`Msg line) -> RunAsync.error line
+    | _ -> RunAsync.error "error"
+
 let parseStdout stdout =
   let open Run.Syntax in
   match String.cut ~rev:true ~sep:"\n" stdout with
@@ -60,8 +67,14 @@ let runCurl cmd =
     end
   in
   try%lwt
-    let cmd = Cmd.getToolAndLine cmd in
-    Lwt_process.with_process_full cmd f
+    let open RunAsync.Syntax in
+    let%bind res = toEsyBashCommand cmd in
+    match res with
+    | Ok v ->
+        print_endline("COMMAND: " ^ (Cmd.toString v));
+        let tl = Cmd.getToolAndLine v in
+        Lwt_process.with_process_full tl f
+    | _ -> RunAsync.error "error running"
   with
   | Unix.Unix_error (err, _, _) ->
     let msg = Unix.error_message err in
@@ -103,8 +116,8 @@ let head url =
 
   let cmd = Cmd.(
     v "curl"
-    % "--head"
     % "--silent"
+    % "--head"
     % "--fail"
     % "--location" % url
   ) in

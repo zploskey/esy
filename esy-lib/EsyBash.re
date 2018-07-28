@@ -68,6 +68,7 @@ let normalizePathForCygwin = path =>
   );
 
 let toEsyBashCommand = (~env=None, cmd) => {
+  print_endline("toEsyBashCommand");
   open Result.Syntax;
   let environmentFilePath =
     switch (env) {
@@ -77,6 +78,7 @@ let toEsyBashCommand = (~env=None, cmd) => {
 
   switch (System.Platform.host) {
   | Windows =>
+    print_endline("toEsyBashCommand::windows");
     let commands = Bos.Cmd.to_list(cmd);
     let%bind esyBashPath = getEsyBashPath();
     let allCommands = List.append(environmentFilePath, commands);
