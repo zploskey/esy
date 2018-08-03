@@ -42,6 +42,14 @@ end
 
 let ofRun = Lwt.return
 
+let ofResult ?err r = 
+    match r with
+    | Ok v -> return v
+    | Error _ ->
+            match err with
+            | Some e -> error e
+            | None -> error "Unknown error"
+
 let ofOption ?err v =
   match v with
   | Some v -> return v
